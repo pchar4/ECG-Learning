@@ -23,19 +23,11 @@ interpreter = tflite.Interpreter(model_path='inference_optimized.tflite')
 inputs = interpreter.get_input_details()[0]['index']
 outputs = interpreter.get_output_details()[0]['index']
 
-# this code gets us our batching (hopefully)
-interpreter.resize_tensor_input(inputs, [1000, 187, 1])
-# ~ interpreter.resize_tensor_input(outputs, [1000, 7])
-interpreter.allocate_tensors()
-print(interpreter.get_input_details()[0]['shape'])
-print(interpreter.get_output_details()[0]['shape'])
-# end of batching specific code
 
-# Get input and output tensors
+# Get input and output tensor details
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-print(input_details)
-print(input_details[0]['index'])
+
 
 # Reshape the data into batches of size 1000 x 187 x 1
 batch_size = 1000
@@ -48,22 +40,23 @@ for i in range(num_batches):
     batches.append(batch)
 
 # If there are remaining rows, you can handle them separately
-if remainder > 0:
-    remaining_batch = X_test[num_batches * batch_size:, :, np.newaxis]
+# ~ if remainder > 0:
+    # ~ remaining_batch = X_test[num_batches * batch_size:, :, np.newaxis]
     # ~ batches.append(remaining_batch)
 
 # 'batches' now contains a list of matrices of size 1000 x 187 x 1
 
 # Make predictions
 start_time = time.time() # timing start
-
 y_pred = []
-for batch in batches:
-    batch = batch.astype(np.float32)
-    interpreter.set_tensor(input_details[0]['index'], batch)
+for i in range(num_batches):
+    input_index = interpreter.resize_tensor_input(inputs, [1000, 187, 1])
+    interpreter.allocate_tensors()
+    interpreter.set_tensor(input_details[0]['index'], batches[i].astype(np.float32))
     interpreter.invoke()
-    output_data = interpreter.get_tensor(output_details[0]['index'])
-    y_pred.append(output_data[0])
+    tflite_model_predictions = interpreter.get_tensor(output_details[0]['index'])
+    y_pred.append(tflite_model_predictions)
+
 
 y_pred = np.array(y_pred)
 end_time = time.time() # timing end
@@ -74,8 +67,8 @@ y_train = ohe.fit_transform(y_train.reshape(-1,1))
 y_val = ohe.fit_transform(y_val.reshape(-1,1))
 y_test = ohe.transform(y_test.reshape(-1,1))
 
-n_classes = 7
-class_names = ['Normal','Other','LBBB','RBBB', 'PVC', 'CHF', 'MI']
+# ~ n_classes = 7
+# ~ class_names = ['Normal','Other','LBBB','RBBB', 'PVC', 'CHF', 'MI']
 # plot ROC curves for each class
 # ~ for i in range(n_classes):
     # ~ fpr, tpr, thresholds = roc_curve(y_test[:, i], y_pred[:, i])
@@ -90,9 +83,9 @@ class_names = ['Normal','Other','LBBB','RBBB', 'PVC', 'CHF', 'MI']
 # plt.title('ROC curves')
 # plt.legend()
 # plt.show()
-print(y_pred.shape)
-print(y_pred)
-print(y_test.shape)
+y_pred = y_pred.reshape(7000, 7)
+y_test = y_test[:7000]
+
 print(classification_report(y_test.argmax(axis=1), y_pred.argmax(axis=1)))
 
 elapsed_time = end_time - start_time
