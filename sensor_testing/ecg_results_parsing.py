@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 # Specify input and output file names
-input_file = 'ecg_vals_upsampled_baseline.txt'  # Change to your actual input file name
+input_file = 'ecg_vals_128sps_right_leg_elev.txt'  # Change to your actual input file name
 output_file = 'output.txt'  # Change to your desired output file name
 plot_file = 'output.txt'
 
@@ -92,7 +92,7 @@ int_values = plot_hex_file(plot_file)
 frequencies, magnitudes = spectrum_plotter(128, int_values)
 
 # Create a figure with two subplots
-fig, axs = plt.subplots(2, 1, figsize=(10, 10))
+fig, axs = plt.subplots(3, 1, figsize=(10, 10))
 
 # Plotting the integers
 axs[0].plot(int_values, marker='.')
@@ -108,6 +108,18 @@ axs[1].set_title('Frequency Spectrum')
 axs[1].set_xlabel('Frequency (Hz)')
 axs[1].set_ylabel('Magnitude')
 axs[1].grid()
+
+int_values_averaged = int_values.copy()
+for i in range(1, len(int_values) -1):
+    int_values_averaged[i] = (int_values[i-1] + int_values[i] + int_values[i+1]) / 3
+
+# Plotting the integers
+axs[2].plot(int_values_averaged, marker='.')
+axs[2].set_title('Averaged Values of ECG Readings')
+axs[2].set_xlabel('Index')
+axs[2].set_ylabel('Voltage')
+axs[2].set_ylim(-1000, 1000)
+axs[2].grid()
 
 # Adjust layout and show
 plt.tight_layout()
