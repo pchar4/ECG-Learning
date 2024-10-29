@@ -88,7 +88,7 @@ def spectrum_plotter(sps, samples):
 # Process the file and get the integers
 int_values = plot_hex_file(plot_file)
 
-# Compute the frequency spectrum
+# Compute the frequency spectrums
 frequencies, magnitudes = spectrum_plotter(128, int_values)
 
 # Create a figure with two subplots
