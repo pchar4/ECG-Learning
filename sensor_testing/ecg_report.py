@@ -4,11 +4,11 @@ import time
 # Create SPI object connecting to /dev/spidev0.1
 spi = spidev.SpiDev(0, 0)
 spi.max_speed_hz = 10000000  # Set speed to 12 MHz
-i_final = 3000
+i_final = 6000
 i_init = 0
 
 # Specify the file name
-file_name = 'ecg_vals_128sps_right_leg_elev.txt'
+file_name = '512_chest_blue_left.txt'
 
 # Open the file in write mode ('w'). This will create the file or overwrite it.
 with open(file_name, 'w') as file:
@@ -21,7 +21,7 @@ with open(file_name, 'w') as file:
                                                     # Rate: 0b10: 128 sps, 0b10 + XX = 0x8
                                                     # Gain: 0b00: 40V/V ->  XX01 for nothing = 0x1
                                                     # X, DHPF, DLPF[1:0] -> DHPF = 1 for 0.5hz hpf, DLPF = 01 = 28.5 Hz = 0x5
-        resp = spi.xfer2([0x2A, 0x40, 0x80, 0x00])  # CNFG_ECG addr = 0x15, 0 for wr--> 0x2A
+        resp = spi.xfer2([0x2A, 0x00, 0x70, 0x00])  # CNFG_ECG addr = 0x15, 0 for wr--> 0x2A
                                                     # Rate: 0b00: 512 sps, 0b00 + XX = 0x0
                                                     # Gain: 0b00: 20V/V ->  0x0
                                                     # X, DHPF, DLPF[1:0] -> DHPF = 1 for 0.5hz hpf, DLPF = 11 = 153.6 Hz = 0x7

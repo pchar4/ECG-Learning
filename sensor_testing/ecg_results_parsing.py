@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 # Specify input and output file names
-input_file = 'ecg_vals_128sps_right_leg_elev.txt'  # Change to your actual input file name
+input_file = '512_chest_blue_right.txt'  # Change to your actual input file name
 output_file = 'output.txt'  # Change to your desired output file name
 plot_file = 'output.txt'
 
@@ -89,14 +89,14 @@ def spectrum_plotter(sps, samples):
 int_values = plot_hex_file(plot_file)
 
 # Compute the frequency spectrums
-frequencies, magnitudes = spectrum_plotter(128, int_values)
+frequencies, magnitudes = spectrum_plotter(512, int_values)
 
 # Create a figure with two subplots
 fig, axs = plt.subplots(3, 1, figsize=(10, 10))
 
 # Plotting the integers
 axs[0].plot(int_values, marker='.')
-axs[0].set_title('Voltage Values of ECG Readings')
+axs[0].set_title('Voltage Values ' + input_file)
 axs[0].set_xlabel('Index')
 axs[0].set_ylabel('Voltage')
 axs[0].set_ylim(-1000, 1000)
